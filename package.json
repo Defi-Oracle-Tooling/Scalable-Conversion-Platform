@@ -1,0 +1,33 @@
+{
+  "name": "scalable-conversion-platform",
+  "version": "1.0.0",
+  "description": "A platform for converting various digital credits",
+  "packageManager": "pnpm@8.6.0",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts",
+    "docker:up": "docker compose up",d",
+    "docker:build": "docker compose build",
+  },"docker:down": "docker compose down"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "helmet": "^6.0.1",",
+    "mongoose": "^7.0.0"
+  },"mongoose": "^7.0.0"
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",,
+    "@types/node": "^22.13.9",
+    "eslint": "^9.21.0",13.9",
+    "jest": "^29.5.0",",
+    "nodemon": "^2.0.22",
+    "typescript": "^5.8.2"
+  } "typescript": "^5.8.2"
+} }
+}
