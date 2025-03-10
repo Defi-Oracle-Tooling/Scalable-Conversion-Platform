@@ -14,6 +14,9 @@ The Scalable Conversion Platform provides a robust API for converting between di
 - **Transaction History**: Track all conversions and transactions with detailed history
 - **Rate Monitoring**: Access real-time and historical exchange rates
 - **Tatum.io Integration**: Leverage the powerful Tatum SDK for blockchain operations
+- **API Rate Limiting**: Protect against abuse with tiered rate limiting for different endpoints
+- **System Monitoring**: Track system health and API performance with detailed metrics
+- **Production-Ready Logging**: Comprehensive request logging for both development and production environments
 
 ## Prerequisites
 
@@ -72,16 +75,19 @@ The Scalable Conversion Platform provides a robust API for converting between di
       "amount": "0.5"
     }
     ```
+  - Rate limited to 10 requests per 5 minutes
 
 - **GET** `/api/conversions/rates`
   - Get current conversion rates
   - Query parameters:
     - `from`: Source currency (e.g., BTC)
     - `to`: Target currency (e.g., ETH)
+  - Rate limited to 10 requests per 5 minutes
 
 - **GET** `/api/conversions/history`
   - Get conversion history
   - Returns the most recent 50 conversions
+  - Rate limited to 10 requests per 5 minutes
 
 ### Accounts
 
@@ -100,12 +106,94 @@ The Scalable Conversion Platform provides a robust API for converting between di
 - **GET** `/api/accounts`
   - Get all accounts
 
+### System Monitoring
+
+- **GET** `/health`
+  - Get system health metrics
+  - Returns CPU, memory, and OS information
+  - No authentication required
+
+- **GET** `/metrics` (Non-production environments only)
+  - Get detailed system metrics
+  - Returns additional metrics including Node.js version and process uptime
+  - Only available in development and test environments
+
 ## Development
 
 - Start development server: `pnpm dev`
 - Run tests: `pnpm test`
 - Build for production: `pnpm build`
 - Lint code: `pnpm lint`
+
+## Monitoring and Rate Limiting
+
+The platform includes comprehensive monitoring and rate limiting features:
+
+### Rate Limiting
+
+- **Global Rate Limiting**: 100 requests per 15 minutes per IP address
+- **API Rate Limiting**: 50 requests per 15 minutes per IP address for all API endpoints
+- **Conversion Rate Limiting**: 10 requests per 5 minutes per IP address for conversion-related endpoints
+
+When a rate limit is exceeded, the API responds with a 429 status code and a JSON response:
+
+```json
+{
+  "success": false,
+  "error": "Too many requests, please try again later."
+}
+```
+
+Rate limiting can be configured in the `src/middleware/rateLimiter.js` file to adjust window sizes and request limits based on your specific requirements.
+
+### Monitoring
+
+- **System Health**: Access real-time system health metrics via the `/health` endpoint
+- **Detailed Metrics**: Access detailed metrics via the `/metrics` endpoint (non-production environments only)
+- **Request Logging**: All API requests are logged with detailed information including:
+  - Request duration
+  - HTTP method and URL
+  - Status code
+  - User agent and IP
+  - System metrics at the time of the request
+
+Example health endpoint response:
+
+```json
+{
+  "status": "ok",
+  "uptime": 3600,
+  "timestamp": "2025-03-10T18:30:00Z",
+  "cpu": {
+    "loadAvg": [0.5, 0.3, 0.2],
+    "cores": 4
+  },
+  "memory": {
+    "total": 8589934592,
+    "free": 4294967296,
+    "used": 4294967296,
+    "usagePercentage": 50
+  },
+  "os": {
+    "platform": "linux",
+    "release": "5.4.0"
+  }
+}
+```
+
+### Production Logging
+
+In production environments, request logs are stored in the `logs` directory with the following format:
+```
+logs/api-metrics-YYYY-MM-DD.log
+```
+
+The logging configuration can be customized in the `src/config/monitoring-config.js` file, allowing you to adjust:
+
+- Log file size and rotation
+- Log content detail level
+- Metrics collection interval
+- System metrics to collect
 
 ## Docker Support
 

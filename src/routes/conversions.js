@@ -3,6 +3,7 @@ const router = express.Router();
 const { TatumSDK } = require('@tatumio/tatum');
 const Conversion = require('../models/Conversion');
 const asyncHandler = require('../middleware/asyncHandler');
+const { conversionLimiter } = require('../middleware/rateLimiter');
 
 // Initialize Tatum SDK
 const initTatum = async () => {
@@ -35,7 +36,7 @@ const initTatum = async () => {
  * @param {string} amount - Amount to convert
  * @returns {Object} Conversion result
  */
-router.post('/convert', asyncHandler(async (req, res) => {
+router.post('/convert', conversionLimiter, asyncHandler(async (req, res) => {
   const { fromCurrency, toCurrency, amount } = req.body;
   
   if (!fromCurrency || !toCurrency || !amount) {
@@ -88,7 +89,7 @@ router.post('/convert', asyncHandler(async (req, res) => {
  * @param {string} to - Target currency code (optional)
  * @returns {Object} Current exchange rates
  */
-router.get('/rates', asyncHandler(async (req, res) => {
+router.get('/rates', conversionLimiter, asyncHandler(async (req, res) => {
   const { from, to } = req.query;
   const tatum = await initTatum();
   
@@ -147,7 +148,7 @@ router.get('/rates', asyncHandler(async (req, res) => {
  * @route GET /api/conversions/history
  * @returns {Object} List of recent conversions
  */
-router.get('/history', asyncHandler(async (req, res) => {
+router.get('/history', conversionLimiter, asyncHandler(async (req, res) => {
   const conversions = await Conversion.find().sort({ createdAt: -1 }).limit(50);
   
   res.json({
