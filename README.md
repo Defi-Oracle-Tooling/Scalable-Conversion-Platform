@@ -79,12 +79,26 @@ The Scalable Conversion Platform provides a robust API for converting between di
     - `from`: Source currency (e.g., BTC)
     - `to`: Target currency (e.g., ETH)
 
-### Accounts (Coming Soon)
+- **GET** `/api/conversions/history`
+  - Get conversion history
+  - Returns the most recent 50 conversions
+
+### Accounts
 
 - **POST** `/api/accounts/create`
   - Create a new blockchain wallet
+  - Request body:
+    ```json
+    {
+      "blockchain": "ethereum"
+    }
+    ```
+
 - **GET** `/api/accounts/:id`
-  - Get account details
+  - Get account details by ID
+
+- **GET** `/api/accounts`
+  - Get all accounts
 
 ## Development
 
@@ -107,6 +121,49 @@ pnpm docker:build
 # Stop containers
 pnpm docker:down
 ```
+
+## Azure Deployment
+
+This project can be deployed to Azure using GitHub Actions. Follow these steps to set up the deployment:
+
+### Prerequisites
+
+- Azure account with an active subscription
+- GitHub account with access to this repository
+- Azure CLI installed locally
+
+### Setup Azure Resources
+
+1. Run the Azure Cosmos DB setup script:
+   ```bash
+   ./scripts/setup-azure-cosmos.sh
+   ```
+
+2. Run the Azure App Service setup script:
+   ```bash
+   ./scripts/setup-azure-app-service.sh
+   ```
+
+3. Add the publish profile as a GitHub secret:
+   - Copy the contents of `publish_profile.xml`
+   - Go to your GitHub repository
+   - Navigate to Settings > Secrets and variables > Actions
+   - Create a new repository secret with the name `AZURE_WEBAPP_PUBLISH_PROFILE`
+   - Paste the contents of the publish profile
+
+4. Configure environment variables in Azure App Service:
+   - Go to the Azure Portal
+   - Navigate to your App Service
+   - Go to Settings > Configuration
+   - Add the following application settings:
+     - `MONGODB_URI`: Your Cosmos DB connection string
+     - `JWT_SECRET`: Your JWT secret
+     - `API_KEY`: Your API key
+     - `TATUM_API_KEY`: Your Tatum API key
+
+### Deployment
+
+The application will be automatically deployed to Azure when changes are pushed to the `main` branch. You can also manually trigger the deployment from the GitHub Actions tab.
 
 ## Tatum.io SDK Integration
 
