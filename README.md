@@ -135,6 +135,17 @@ The platform includes comprehensive monitoring and rate limiting features:
 - **API Rate Limiting**: 50 requests per 15 minutes per IP address for all API endpoints
 - **Conversion Rate Limiting**: 10 requests per 5 minutes per IP address for conversion-related endpoints
 
+When a rate limit is exceeded, the API responds with a 429 status code and a JSON response:
+
+```json
+{
+  "success": false,
+  "error": "Too many requests, please try again later."
+}
+```
+
+Rate limiting can be configured in the `src/middleware/rateLimiter.js` file to adjust window sizes and request limits based on your specific requirements.
+
 ### Monitoring
 
 - **System Health**: Access real-time system health metrics via the `/health` endpoint
@@ -146,12 +157,43 @@ The platform includes comprehensive monitoring and rate limiting features:
   - User agent and IP
   - System metrics at the time of the request
 
+Example health endpoint response:
+
+```json
+{
+  "status": "ok",
+  "uptime": 3600,
+  "timestamp": "2025-03-10T18:30:00Z",
+  "cpu": {
+    "loadAvg": [0.5, 0.3, 0.2],
+    "cores": 4
+  },
+  "memory": {
+    "total": 8589934592,
+    "free": 4294967296,
+    "used": 4294967296,
+    "usagePercentage": 50
+  },
+  "os": {
+    "platform": "linux",
+    "release": "5.4.0"
+  }
+}
+```
+
 ### Production Logging
 
 In production environments, request logs are stored in the `logs` directory with the following format:
 ```
 logs/api-metrics-YYYY-MM-DD.log
 ```
+
+The logging configuration can be customized in the `src/config/monitoring-config.js` file, allowing you to adjust:
+
+- Log file size and rotation
+- Log content detail level
+- Metrics collection interval
+- System metrics to collect
 
 ## Docker Support
 
