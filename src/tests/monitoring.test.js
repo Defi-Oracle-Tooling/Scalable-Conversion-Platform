@@ -74,15 +74,28 @@ describe('Monitoring Middleware', () => {
     // Save original NODE_ENV
     const originalEnv = process.env.NODE_ENV;
     
-    // Set NODE_ENV to production for this test
-    process.env.NODE_ENV = 'production';
-    
-    const res = await request(app).get('/metrics');
-    
-    expect(res.statusCode).toEqual(404);
-    
-    // Restore original NODE_ENV
-    process.env.NODE_ENV = originalEnv;
+    try {
+      // Set NODE_ENV to production for this test
+      process.env.NODE_ENV = 'production';
+      
+      // Clear require cache to force reload of server with new environment
+      jest.resetModules();
+      
+      // Create a new app instance with the updated environment
+      const prodApp = require('../server');
+      
+      const res = await request(prodApp).get('/metrics');
+      
+      // In production, the metrics endpoint should not be defined, resulting in a 404
+      expect(res.statusCode).toEqual(404);
+    } finally {
+      // Restore original NODE_ENV
+      process.env.NODE_ENV = originalEnv;
+      // Reset modules again to restore original state
+      jest.resetModules();
+      // Reload the app with original environment
+      require('../server');
+    }
   });
 
   it('getSystemHealth should return valid system metrics', () => {
